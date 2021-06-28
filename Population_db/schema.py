@@ -1,11 +1,12 @@
 from marshmallow import Schema, fields, post_load
-from store import Store
+from Population_db.store import Store
 
 
 class StoreSchema(Schema):
-     _id = fields.Str()
-     name = fields.Str()
-     location = fields.Str()
+     _id = fields.Int()
+     
+    
+     fitness = fields.Float()
 
      @post_load
      def make_store(self, data, **kwargs):

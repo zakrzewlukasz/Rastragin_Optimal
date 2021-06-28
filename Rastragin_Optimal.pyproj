@@ -12,6 +12,7 @@
     <Name>Rastragin_Optimal</Name>
     <RootNamespace>Rastragin_Optimal</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
+    <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,15 +33,19 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Rastragin_Optimal.py" />
-    <Compile Include="schema.py">
+    <Compile Include="Population_db\schema.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="store.py">
+    <Compile Include="Population_db\store.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="test.py">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Info_db\" />
+    <Folder Include="Population_db\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
