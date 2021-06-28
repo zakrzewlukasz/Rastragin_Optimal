@@ -5,7 +5,11 @@ store_schema = StoreSchema()
 
 Database.initialize()
 <<<<<<< HEAD
+<<<<<<< HEAD
 Database.save_to_db({"_id": 156, "parameters": [0,1], "stadnard_deviation": [33,66], "fitness": 22.77})
+=======
+#Database.save_to_db({"_id": "18", "name": "Walmart", "location": "Ve, CA"})
+>>>>>>> parent of 65101da (Działa_zapis)
 =======
 #Database.save_to_db({"_id": "18", "name": "Walmart", "location": "Ve, CA"})
 >>>>>>> parent of 65101da (Działa_zapis)
