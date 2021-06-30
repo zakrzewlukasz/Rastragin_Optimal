@@ -1,30 +1,28 @@
 import random
 import math
+import uuid
 from numpy import cos
 from numpy import pi
 from numpy.random import randn
 from numpy.random import rand
 from numpy.random import seed
 
-class Invid:
+class Population:
     """
     Model osobnika
     """
-    def __init__(self, init_state=None):
+    def __init__(self, fitness, _id: int = None):
         """
         :param list init_state: dwuelementowa lista zawierająca początkowe wartości
+
         """
-        if init_state is None:
-            self.param_values = []
-            self.odchylenia = []
-        else:
-            self.param_values, self.odchylenia = init_state
- 
-        self.value = 0
+        self.parameters = []
+        self.standard_deviation = []
+        self.fitness = fitness
+        self._id = _id or uuid.uuid4().hex
 
 
-    def __lt__(self, other):
-        return self.value < other.value
+
 
     #ta funckja chyba nie tu -> Rastargin
     def objective(self, v):	    
@@ -38,16 +36,10 @@ class Invid:
         Wygeneruj ciąg wartości parametrów, ktore są reprezentowane przez liczby rzeczywiste od <-10;10>
         o podanej długości oraz ciąg odchyleń standardowych o tej samej długości.
 
-        :param int number: ilość liczb w wektorach do wygenerowania
         """
-        #candidate = None
-        #sigma = None
-        #candidate = bounds[:, 0] + rand(len(bounds)) * (bounds[:, 1] - bounds[:, 0])
-        #sigma = rand(len(bounds))
-        #self.param_values.append(candidate)
-        #self.odchylenia.append(sigma)
-        self.param_values = bounds[:, 0] + rand(len(bounds)) * (bounds[:, 1] - bounds[:, 0])
-        self.odchylenia = rand(len(bounds))
+
+        self.parameters = bounds[:, 0] + rand(len(bounds)) * (bounds[:, 1] - bounds[:, 0])
+        self.standard_deviation(bounds)
 
 
     def calculate_value(self, val):
@@ -55,10 +47,8 @@ class Invid:
         Wyznacz przystosowanie osobnika na podstawie jego wektora parametrów.
         Składowe wektora są sortowane i ich kolejność wyznacza trase.
 
-
         """
-        self.value = self.objective(val)
-     
+        self.value = self.objective(val)    
 
     def mutation(self):
         """
