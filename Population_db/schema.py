@@ -7,8 +7,8 @@ class InnerSchema(Schema):
 
 class StoreSchema(Schema):
      _id = fields.Int()
-     parameters = []
-     standard_deviation = []
+     parameters = fields.List(fields.Float)
+     standard_deviation = fields.List(fields.Float)
      fitness = fields.Float()
 
      @post_load
