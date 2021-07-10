@@ -134,9 +134,9 @@ class Genetic:
         for _ in range(pop_lenght * multiply):
             nums = random.sample(pop_nums, k=2)
             krzyzowanie = [populacja[nums[i]] for i in range(len(nums))]
-            new_param = np.divide(np.add(krzyzowanie[0].param_values, krzyzowanie[1].param_values), 2)
-            new_odch = np.divide(np.add(krzyzowanie[0].odchylenia, krzyzowanie[1].odchylenia), 2)
-            childrens.append(Invid([list(new_param), list(new_odch)]))
+            new_param = np.divide(np.add(krzyzowanie[0].parameters, krzyzowanie[1].parameters), 2)
+            new_odch = np.divide(np.add(krzyzowanie[0].standard_deviation, krzyzowanie[1].standard_deviation), 2)
+            childrens.append(Population([list(new_param), list(new_odch)]))
         return childrens
 
 

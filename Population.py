@@ -55,16 +55,16 @@ class Population:
         """
         Mutacja wektora parametrów oraz wektora odchyleń osobnika
         """
-        n = len(self.param_values)
+        n = len(self.parameters)
         rand1 = random.normalvariate(0, 1)
         tau = 1/((2*n**(1/2))**(1/2))
         fi = 1/((2 * n) ** (1 / 2))
         for i in range(n):
             rand2 = random.normalvariate(0, 1)
-            self.odchylenia[i] *= math.exp(tau*rand2 + fi*rand1)
-            if self.odchylenia[i] < 0.1:
-                self.odchylenia[i] = 0.1
-            rand3 = random.normalvariate(0, self.odchylenia[i])
-            self.param_values[i] += rand3
+            self.standard_deviation[i] *= math.exp(tau*rand2 + fi*rand1)
+            if self.standard_deviation[i] < 0.1:
+                self.standard_deviation[i] = 0.1
+            rand3 = random.normalvariate(0, self.standard_deviation[i])
+            self.parameters[i] += rand3
    
   
