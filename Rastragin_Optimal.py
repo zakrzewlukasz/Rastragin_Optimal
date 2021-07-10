@@ -44,18 +44,23 @@ class Genetic:
     #            return False
     #        return True
 
-    def initiate_population(self, liczba_osobnikow):
+    def initiate_population(self, liczba_osobnikow): #raczej w populacji kalsa
 
         # inicjacja populacji
         for i in range(liczba_osobnikow):
             self.populacja.append(Population())
-            self.populacja[i]._id = i 
+            #self.populacja[i]._id = i 
             self.populacja[i].generate(liczba_osobnikow, bounds)
             self.populacja[i].calculate_value(self.populacja[i].parameters)
             #populacja[i].calculate_value(self.dist_matrix, self.time_matrix, self.cost_matrix)
 
         self.min = self.populacja[0].fitness
 
+    def sort_population(self, liczba_osobnikow): # raczej w populacji kalsa
+        self.populacja.sort(key=lambda x: x.fitness)
+
+        for i in range(liczba_osobnikow):
+            self.populacja[i]._id = i
 
     def start_algorithm(self, start_pop, no_of_gen):
         """
@@ -66,17 +71,17 @@ class Genetic:
         """
         liczba_pokolen = no_of_gen
         liczba_osobnikow = start_pop
-        populacja = []
+        #populacja = []
 
 
         # inicjacja populacji
-        for i in range(liczba_osobnikow):
-            populacja.append(Invid())
-            populacja[i].generate(liczba_osobnikow, bounds)
-            populacja[i].calculate_value(populacja[i].param_values)
-            #populacja[i].calculate_value(self.dist_matrix, self.time_matrix, self.cost_matrix)
+        #for i in range(liczba_osobnikow):
+        #    populacja.append(Invid())
+        #    populacja[i].generate(liczba_osobnikow, bounds)
+        #    populacja[i].calculate_value(populacja[i].param_values)
+        #    #populacja[i].calculate_value(self.dist_matrix, self.time_matrix, self.cost_matrix)
 
-        self.min = populacja[0].value
+        self.min = self.populacja[0].fitness
 
         #db = DB()
         #db.conncect(populacja, liczba_osobnikow)
@@ -89,14 +94,14 @@ class Genetic:
             ############################################
             #           KRZYŻOWANIE I MUTACJA
 
-            childrens = self.crossover_arithmetic(populacja)
+            childrens = self.crossover_arithmetic(self.populacja) #children do poprawy nie ma childrens
             for child in childrens:
                 child.mutation()
                 child.calculate_value(child.param_values)
-                populacja.append(child)
+                self.populacja.append(child)
             ############################################
             #           ZNAJDŹ LEPSZEGO OSOBNIKA
-            for inv in populacja:
+            for inv in self.populacja:
                 if self.min > inv.value:
                     self.min = inv.value
                     self.best_gen = no_of_gen - liczba_pokolen
@@ -105,10 +110,10 @@ class Genetic:
                     #print(self.best_gen)
             ############################################
             #               SELEKCJA
-            populacja.sort()
-            populacja = populacja[:liczba_osobnikow]
+            self.populacja.sort()
+            self.populacja = populacja[:liczba_osobnikow]
             self.best_results.append(self.min)
-            #print(self.best_results)
+            print(self.best_results)
             liczba_pokolen -= 1
             print(liczba_pokolen)
 
@@ -141,13 +146,16 @@ if __name__ == "__main__":
     gen = Genetic()
     #gen2.start_algorithm(100, 30)
 
+    store_schema = StoreSchema()
+
     Database.initialize()
     Database.delete_db_collection_evo_records()
     #db.mongodb_connect()
     #if db.instance == 1:
     liczba_osobnikow = int(input('Wprowadź rozmair populacji początkowej µ: ' ))
     gen.initiate_population(liczba_osobnikow)
-    gen.populacja.sort(key=lambda x: x.fitness)
+    gen.sort_population(liczba_osobnikow)
+    #gen.populacja.sort(key=lambda x: x.fitness)
         #db.store_population(gen.populacja, liczba_osobnikow)
 
     for i in range(len(gen.populacja)): 
@@ -155,6 +163,15 @@ if __name__ == "__main__":
         #print(gen.populacja[i]._id)
         Database.save_to_db({"_id":gen.populacja[i]._id, "parameters": gen.populacja[i].parameters.tolist(), "standard_deviation": gen.populacja[i].standard_deviation.tolist(), "fitness": gen.populacja[i].fitness})
         #Database.save_to_db({"_id": 156, "parameters": [0,1], "stadnard_deviation": [33,66], "fitness": 22.77})
+
+    gen.start_algorithm(100, 30)
+
+
+    loaded_objects = Database.load_from_db({"_id": {'$gte' : 0, '$lt' : liczba_osobnikow/2 }})
+    for loaded_store in loaded_objects:
+        store = store_schema.load(loaded_store)
+        print(store._id)
+        print(store.fitness)
 
     #    #SELEKCJA KONWEKCYJNA
     #    while db.instance -1 >= db.algo_end: #Wartość pominiejszona, bo w instnaces jest też master, który nie wykonuje obliczeń

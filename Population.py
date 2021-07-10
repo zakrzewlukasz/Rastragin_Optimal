@@ -11,7 +11,8 @@ class Population:
     """
     Model osobnika
     """
-    def __init__(self, fitness: int = None, _id: int = None):
+    def __init__(self, fitness:
+                int = None, _id: int = None):
         """
         :param list init_state: dwuelementowa lista zawierająca początkowe wartości
 
