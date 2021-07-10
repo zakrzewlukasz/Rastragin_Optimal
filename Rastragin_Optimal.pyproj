@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>e3f025d6-e030-4339-92f9-fddb937ca843</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>test.py</StartupFile>
+    <StartupFile>Rastragin_Optimal.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>

@@ -19,5 +19,10 @@ class Database:
 		cls.database.evo_records.update_one(find, query)
 
 	@classmethod
+	def delete_db_collection_evo_records(cls):
+		cls.database.evo_records.drop()
+
+	@classmethod
 	def load_from_db_info(cls, query):
 		return cls.database.info.find(query)
+

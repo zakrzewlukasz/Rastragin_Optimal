@@ -11,7 +11,7 @@ class Population:
     """
     Model osobnika
     """
-    def __init__(self, fitness, _id: int = None):
+    def __init__(self, fitness: int = None, _id: int = None):
         """
         :param list init_state: dwuelementowa lista zawierająca początkowe wartości
 
@@ -39,7 +39,7 @@ class Population:
         """
 
         self.parameters = bounds[:, 0] + rand(len(bounds)) * (bounds[:, 1] - bounds[:, 0])
-        self.standard_deviation(bounds)
+        self.standard_deviation = rand(len(bounds))
 
 
     def calculate_value(self, val):
@@ -48,7 +48,7 @@ class Population:
         Składowe wektora są sortowane i ich kolejność wyznacza trase.
 
         """
-        self.value = self.objective(val)    
+        self.fitness = self.objective(val)    
 
     def mutation(self):
         """
