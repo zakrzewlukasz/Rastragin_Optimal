@@ -164,7 +164,7 @@ if __name__ == "__main__":
         Database.save_to_db({"_id":gen.populacja[i]._id, "parameters": gen.populacja[i].parameters.tolist(), "standard_deviation": gen.populacja[i].standard_deviation.tolist(), "fitness": gen.populacja[i].fitness})
         #Database.save_to_db({"_id": 156, "parameters": [0,1], "stadnard_deviation": [33,66], "fitness": 22.77})
 
-    gen.start_algorithm(100, 30)
+    gen.start_algorithm(liczba_osobnikow, 30)
 
 
     loaded_objects = Database.load_from_db({"_id": {'$gte' : 0, '$lt' : liczba_osobnikow/2 }})
