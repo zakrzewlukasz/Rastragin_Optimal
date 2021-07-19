@@ -55,7 +55,7 @@ class Population:
         """
         Mutacja wektora parametrów oraz wektora odchyleń osobnika
         """
-        n = len(self.fitness)
+        n = len(self.standard_deviation)
         rand1 = random.normalvariate(0, 1)
         tau = 1/((2*n**(1/2))**(1/2))
         fi = 1/((2 * n) ** (1 / 2))

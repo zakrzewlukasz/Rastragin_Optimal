@@ -97,25 +97,28 @@ class Genetic:
             childrens = self.crossover_arithmetic(self.populacja) #children do poprawy nie ma childrens
             for child in childrens:
                 child.mutation()
-                child.calculate_value(child.param_values)
+                child.calculate_value(child.parameters)
                 self.populacja.append(child)
             ############################################
             #           ZNAJDŹ LEPSZEGO OSOBNIKA
             for inv in self.populacja:
-                if self.min > inv.value:
-                    self.min = inv.value
+                if self.min > inv.fitness:
+                    self.min = inv.fitness
                     self.best_gen = no_of_gen - liczba_pokolen
-                    print(self.min)
-                    print(inv.param_values)
+                    
+                    #print(self.min)
+                    #print(inv.parameters)
                     #print(self.best_gen)
             ############################################
             #               SELEKCJA
-            self.populacja.sort()
-            self.populacja = populacja[:liczba_osobnikow]
-            self.best_results.append(self.min)
+            self.sort_population(liczba_osobnikow)
+            self.populacja = self.populacja[:liczba_osobnikow]
+            #self.best_results.append(self.min) #chyba równa się, bo robi tablice 
+            self.best_results = self.min
             print(self.best_results)
             liczba_pokolen -= 1
-            print(liczba_pokolen)
+            #print(liczba_pokolen)
+            print(self.populacja.fitness[2])
 
 
     def crossover_arithmetic(self, populacja, multiply=10):
@@ -136,7 +139,9 @@ class Genetic:
             krzyzowanie = [populacja[nums[i]] for i in range(len(nums))]
             new_param = np.divide(np.add(krzyzowanie[0].parameters, krzyzowanie[1].parameters), 2)
             new_odch = np.divide(np.add(krzyzowanie[0].standard_deviation, krzyzowanie[1].standard_deviation), 2)
-            childrens.append(Population([list(new_param), list(new_odch)]))
+            childrens.append(Population())
+            childrens[_].parameters = list(new_param)
+            childrens[_].standard_deviation = list(new_odch)
         return childrens
 
 
@@ -170,8 +175,8 @@ if __name__ == "__main__":
     loaded_objects = Database.load_from_db({"_id": {'$gte' : 0, '$lt' : liczba_osobnikow/2 }})
     for loaded_store in loaded_objects:
         store = store_schema.load(loaded_store)
-        print(store._id)
-        print(store.fitness)
+        #print(store._id)
+        #print(store.fitness)
 
     #    #SELEKCJA KONWEKCYJNA
     #    while db.instance -1 >= db.algo_end: #Wartość pominiejszona, bo w instnaces jest też master, który nie wykonuje obliczeń
