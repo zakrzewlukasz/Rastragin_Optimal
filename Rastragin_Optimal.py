@@ -94,8 +94,8 @@ class Genetic:
             ############################################
             #           KRZYŻOWANIE I MUTACJA
 
-            childrens = self.crossover_arithmetic(self.populacja) #children do poprawy nie ma childrens
-            for child in childrens:
+            children = self.crossover_arithmetic() #children do poprawy nie ma childrens
+            for child in children:
                 child.mutation()
                 child.calculate_value(child.parameters)
                 self.populacja.append(child)
@@ -115,13 +115,13 @@ class Genetic:
             self.populacja = self.populacja[:liczba_osobnikow]
             #self.best_results.append(self.min) #chyba równa się, bo robi tablice 
             self.best_results = self.min
-            print(self.best_results)
+            #print(self.best_results)
             liczba_pokolen -= 1
             #print(liczba_pokolen)
-            print(self.populacja.fitness[2])
+            
 
 
-    def crossover_arithmetic(self, populacja, multiply=10):
+    def crossover_arithmetic(self, multiply=10):
         """
         Operacja rekombinacji
 
@@ -130,19 +130,19 @@ class Genetic:
         :return: pula potomków
         :type return: list
         """
-        childrens = []
-        pop_lenght = len(populacja)
-        random.shuffle(populacja)
+        children = []
+        pop_lenght = len(self.populacja)
+        random.shuffle(self.populacja)
         pop_nums = range(0, pop_lenght)
         for _ in range(pop_lenght * multiply):
             nums = random.sample(pop_nums, k=2)
-            krzyzowanie = [populacja[nums[i]] for i in range(len(nums))]
+            krzyzowanie = [self.populacja[nums[i]] for i in range(len(nums))]
             new_param = np.divide(np.add(krzyzowanie[0].parameters, krzyzowanie[1].parameters), 2)
             new_odch = np.divide(np.add(krzyzowanie[0].standard_deviation, krzyzowanie[1].standard_deviation), 2)
-            childrens.append(Population())
-            childrens[_].parameters = list(new_param)
-            childrens[_].standard_deviation = list(new_odch)
-        return childrens
+            children.append(Population())
+            children[_].parameters = list(new_param)
+            children[_].standard_deviation = list(new_odch)
+        return children
 
 
 
@@ -150,7 +150,7 @@ if __name__ == "__main__":
     bounds = asarray([[-5.12, 5.12], [-5.12, 5.12]])
     gen = Genetic()
     #gen2.start_algorithm(100, 30)
-
+    pop = Population()
     store_schema = StoreSchema()
 
     Database.initialize()
@@ -171,6 +171,8 @@ if __name__ == "__main__":
 
     gen.start_algorithm(liczba_osobnikow, 30)
 
+    for i in range(len(gen.populacja)): 
+        Database.update_to_db({"_id":gen.populacja[i]._id, "parameters": gen.populacja[i].parameters, "standard_deviation": gen.populacja[i].standard_deviation, "fitness": gen.populacja[i].fitness})
 
     loaded_objects = Database.load_from_db({"_id": {'$gte' : 0, '$lt' : liczba_osobnikow/2 }})
     for loaded_store in loaded_objects:
