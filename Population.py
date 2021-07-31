@@ -11,14 +11,13 @@ class Population:
     """
     Model osobnika
     """
-    def __init__(self, fitness:
-                int = None, _id: int = None):
+    def __init__(self, parameters: float = None, standard_deviation: float = None, fitness: float = None, _id: int = None):
         """
         :param list init_state: dwuelementowa lista zawierająca początkowe wartości
 
         """
-        self.parameters = []
-        self.standard_deviation = []
+        self.parameters = parameters
+        self.standard_deviation = standard_deviation
         self.fitness = fitness
         self._id = _id or uuid.uuid4().hex
 

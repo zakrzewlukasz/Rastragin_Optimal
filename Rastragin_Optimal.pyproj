@@ -32,6 +32,12 @@
     <Compile Include="Population.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Population_db\schema_info.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Population_db\store_info.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Rastragin_Optimal.py" />
     <Compile Include="Population_db\schema.py">
       <SubType>Code</SubType>

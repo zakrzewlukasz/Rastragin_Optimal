@@ -11,10 +11,12 @@ from numpy.random import randn
 from numpy.random import rand
 from numpy.random import seed
 import time
+from bson.objectid import ObjectId
 
 from Population import Population
 from Database import Database
 from Population_db.schema import StoreSchema
+from Population_db.schema_info import StoreSchema_info
 
 
 
@@ -33,6 +35,7 @@ class Genetic:
         self.mu = 20
         self.populacja = []
         self.sub_population = []
+        self.info = []
 
 
         # check if a point is within the bounds of the search
@@ -149,36 +152,77 @@ class Genetic:
 if __name__ == "__main__":
     bounds = asarray([[-5.12, 5.12], [-5.12, 5.12]])
     gen = Genetic()
-    #gen2.start_algorithm(100, 30)
-    pop = Population()
     store_schema = StoreSchema()
+    store_schema_info = StoreSchema_info()
 
     Database.initialize()
-    Database.delete_db_collection_evo_records()
-    #db.mongodb_connect()
-    #if db.instance == 1:
-    liczba_osobnikow = int(input('Wprowadź rozmair populacji początkowej µ: ' ))
-    gen.initiate_population(liczba_osobnikow)
-    gen.sort_population(liczba_osobnikow)
-    #gen.populacja.sort(key=lambda x: x.fitness)
-        #db.store_population(gen.populacja, liczba_osobnikow)
+    #Database.save_to_db_info({"_id": 0, "instances": 0, "algo_start": 6, "algo_end": 0})
 
-    for i in range(len(gen.populacja)): 
-        #https://careerkarma.com/blog/python-typeerror-list-indices-must-be-integers-or-slices-not-str/  opis range len 
-        #print(gen.populacja[i]._id)
-        Database.save_to_db({"_id":gen.populacja[i]._id, "parameters": gen.populacja[i].parameters.tolist(), "standard_deviation": gen.populacja[i].standard_deviation.tolist(), "fitness": gen.populacja[i].fitness})
-        #Database.save_to_db({"_id": 156, "parameters": [0,1], "stadnard_deviation": [33,66], "fitness": 22.77})
 
-    gen.start_algorithm(liczba_osobnikow, 30)
 
-    for i in range(len(gen.populacja)): 
-        Database.update_to_db({"_id":gen.populacja[i]._id, "parameters": gen.populacja[i].parameters, "standard_deviation": gen.populacja[i].standard_deviation, "fitness": gen.populacja[i].fitness})
 
-    loaded_objects = Database.load_from_db({"_id": {'$gte' : 0, '$lt' : liczba_osobnikow/2 }})
+
+    #Pobierz informacje o ilości podłączonych komputerów 
+    loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
+    for loaded_store in loaded_info:
+        gen.info = store_schema_info.load(loaded_store)
+
+    #Ta instacja zostaje nodem w algorytmie, czyli generuje populację oraz rozdziela obliczenia 
+    if gen.info.instances == 0:
+        #Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": 1}})
+        
+        #Usuń rekordy dotyczące populacji z bazy danych 
+        #Database.delete_db_collection_evo_records()
+
+        #Wprowadź wilekość populacji 
+        #liczba_osobnikow = int(input('Wprowadź rozmair populacji początkowej µ: ' ))
+
+        #Wygeneruj populację 
+        #gen.initiate_population(liczba_osobnikow)
+        #gen.sort_population(liczba_osobnikow)
+
+        #Zapisz populację do bazy danych 
+        #for i in range(len(gen.populacja)): 
+        #    #https://careerkarma.com/blog/python-typeerror-list-indices-must-be-integers-or-slices-not-str/  opis range len 
+        #    #print(gen.populacja[i]._id)
+        #    Database.save_to_db({"_id":gen.populacja[i]._id, "parameters": gen.populacja[i].parameters.tolist(), "standard_deviation": gen.populacja[i].standard_deviation.tolist(), "fitness": gen.populacja[i].fitness})
+        
+
+        print("Czy rozpocząć obliczenia? \n tak - rozpocznij obliczenia \n nie - oczekuje na połączenie innych komputerów, \n end- kończy pracę \n")
+        print("Obecnie podłączona liczba komputerów: " + str(gen.info.instances))
+        value = str(input())
+
+        while value != 'end':
+
+            if value == 'tak':
+                print("tak")
+                #Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 1}})
+               
+            elif value == 'nie':
+                    #Pobierz informacje o ilości podłączonych komputerów 
+                    loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
+                    for loaded_store in loaded_info:
+                        gen.info = store_schema_info.load(loaded_store)
+                    print("Obecnie podłaczono: ") + str(gen.info.instances -1)
+
+            value = str(input())
+
+        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": instances -1}})
+
+    loaded_objects = Database.load_from_db({"_id": {'$gte' : 0, '$lt' : 60 }})
     for loaded_store in loaded_objects:
-        store = store_schema.load(loaded_store)
-        #print(store._id)
-        #print(store.fitness)
+        gen.populacja.append(store_schema.load(loaded_store))
+        #print(store.parameters)
+        #gen.populacja.append(Population(store.parameters, store.standard_deviation, store.fitness, store._id))
+
+    #for i in gen.populacja:
+    #    print(i.fitness)
+
+    gen.start_algorithm(len(gen.populacja), 30)
+
+
+    for i in range(len(gen.populacja)): 
+        Database.update_to_db({"_id": {'$eq': i}}, {"_id":gen.populacja[i]._id, "parameters": gen.populacja[i].parameters, "standard_deviation": gen.populacja[i].standard_deviation, "fitness": gen.populacja[i].fitness})
 
     #    #SELEKCJA KONWEKCYJNA
     #    while db.instance -1 >= db.algo_end: #Wartość pominiejszona, bo w instnaces jest też master, który nie wykonuje obliczeń

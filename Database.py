@@ -16,11 +16,19 @@ class Database:
 
 	@classmethod
 	def update_to_db(cls, find , query):
-		cls.database.evo_records.update_one(find, query)
+		cls.database.evo_records.update(find, query)
 
 	@classmethod
 	def delete_db_collection_evo_records(cls):
 		cls.database.evo_records.drop()
+##############   DB INFO   ##########################
+	@classmethod
+	def save_to_db_info(cls, data):
+		cls.database.info.insert_one(data)
+
+	@classmethod
+	def update_to_db_info(cls, find , query):
+		cls.database.info.update(find, query)
 
 	@classmethod
 	def load_from_db_info(cls, query):
