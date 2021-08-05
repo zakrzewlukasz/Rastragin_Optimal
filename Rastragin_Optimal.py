@@ -167,7 +167,7 @@ if __name__ == "__main__":
     for loaded_store in loaded_info:
         gen.info = store_schema_info.load(loaded_store)
 
-    #Ta instacja zostaje nodem w algorytmie, czyli generuje populację oraz rozdziela obliczenia 
+    #Ta instacja zostaje rootem w algorytmie, czyli generuje populację oraz rozdziela obliczenia 
     if gen.info.instances == 0:
         #Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": 1}})
         
@@ -176,6 +176,9 @@ if __name__ == "__main__":
 
         #Wprowadź wilekość populacji 
         #liczba_osobnikow = int(input('Wprowadź rozmair populacji początkowej µ: ' ))
+
+        #Zapisz rozmiar populacji 
+        #Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"population_size": liczba_osobnikow}})
 
         #Wygeneruj populację 
         #gen.initiate_population(liczba_osobnikow)
@@ -186,39 +189,56 @@ if __name__ == "__main__":
         #    #https://careerkarma.com/blog/python-typeerror-list-indices-must-be-integers-or-slices-not-str/  opis range len 
         #    #print(gen.populacja[i]._id)
         #    Database.save_to_db({"_id":gen.populacja[i]._id, "parameters": gen.populacja[i].parameters.tolist(), "standard_deviation": gen.populacja[i].standard_deviation.tolist(), "fitness": gen.populacja[i].fitness})
-        
+     
 
         print("Czy rozpocząć obliczenia? \n tak - rozpocznij obliczenia \n nie - oczekuje na połączenie innych komputerów, \n end- kończy pracę \n")
         print("Obecnie podłączona liczba komputerów: " + str(gen.info.instances))
         value = str(input())
 
         while value != 'end':
+            #Pobierz informacje o ilości podłączonych komputerów 
+            loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
+            for loaded_store in loaded_info:
+                gen.info = store_schema_info.load(loaded_store)
+            print("Obecnie podłaczono: ") + str(gen.info.instances -1)
 
             if value == 'tak':
                 print("tak")
-                #Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 1}})
+                Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 1}})
                
             elif value == 'nie':
-                    #Pobierz informacje o ilości podłączonych komputerów 
-                    loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
-                    for loaded_store in loaded_info:
-                        gen.info = store_schema_info.load(loaded_store)
                     print("Obecnie podłaczono: ") + str(gen.info.instances -1)
 
             value = str(input())
 
-        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": instances -1}})
 
-    loaded_objects = Database.load_from_db({"_id": {'$gte' : 0, '$lt' : 60 }})
-    for loaded_store in loaded_objects:
-        gen.populacja.append(store_schema.load(loaded_store))
-        #print(store.parameters)
-        #gen.populacja.append(Population(store.parameters, store.standard_deviation, store.fitness, store._id))
+    #Ta instancja zostaje nodem, wykonuje obliczenia 
+    elif gen.info.instances > 0:
+        instance_number = gen.info.instances
+        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": gen.info.instances + 1}})
+ 
 
-    #for i in gen.populacja:
-    #    print(i.fitness)
 
-    gen.start_algorithm(len(gen.populacja), 30)
+        while gen.info.algo_start =! 1:
+            #Pobierz informacje o ilości podłączonych komputerów 
+            loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
+            for loaded_store in loaded_info:
+                gen.info = store_schema_info.load(loaded_store)
+            print("Obecnie podłaczono: ") + str(gen.info.instances -1)
+
+            if gen.info.algo_start == 1:
+                #Część całkwita dzielenia // ---> początek::((instance number-1)*poulation_size)//instances  koniec:(instance number*poulation_size)//instances (instances pomijeszamy, bo jest tam rootem)
+                loaded_objects = Database.load_from_db({"_id": {'$gte' : ((instance_number - 1)*gen.info.population_size)//(gen.inf.instances - 1) , '$lt' : (instance_number*gen.info.population_size)//(gen.inf.instances - 1) }})
+                for loaded_store in loaded_objects:
+                    gen.populacja.append(store_schema.load(loaded_store))
+
+            time.sleep(10)
+
+    Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": instances -1}})
+
+
+
+#    gen.start_algorithm(len(gen.populacja), 30)
 
 
     for i in range(len(gen.populacja)): 
@@ -245,3 +265,21 @@ if __name__ == "__main__":
 
 
     #db.mongodb_disconncect()
+
+
+
+
+
+
+
+
+
+
+    #    loaded_objects = Database.load_from_db({"_id": {'$gte' : 0, '$lt' : 60 }})
+    #for loaded_store in loaded_objects:
+    #    gen.populacja.append(store_schema.load(loaded_store))
+    #    #print(store.parameters)
+    #    #gen.populacja.append(Population(store.parameters, store.standard_deviation, store.fitness, store._id))
+
+    ##for i in gen.populacja:
+    ##    print(i.fitness)
