@@ -6,6 +6,7 @@ class StoreSchema_info(Schema):
      instances = fields.Int()
      algo_start = fields.Int()
      algo_end = fields.Int()
+     end = fields.Boolean()
      population_size = fields.Int()
 
      @post_load
