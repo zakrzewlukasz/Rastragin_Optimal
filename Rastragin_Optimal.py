@@ -171,28 +171,30 @@ if __name__ == "__main__":
     if gen.info.instances == 0:
         Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": 1}})
         Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"end": False}})
+        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 0}})
+        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_end": 0}})
         
         #Usuń rekordy dotyczące populacji z bazy danych 
-        #Database.delete_db_collection_evo_records()
+        Database.delete_db_collection_evo_records()
 
         #Wprowadź wilekość populacji 
-        #liczba_osobnikow = int(input('Wprowadź rozmair populacji początkowej µ: ' ))
+        liczba_osobnikow = int(input('Wprowadź rozmair populacji początkowej µ: ' ))
 
         #Zapisz rozmiar populacji 
-        #Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"population_size": liczba_osobnikow}})
+        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"population_size": liczba_osobnikow}})
 
         #Wygeneruj populację 
-        #gen.initiate_population(liczba_osobnikow)
-        #gen.sort_population(liczba_osobnikow)
+        gen.initiate_population(liczba_osobnikow)
+        gen.sort_population(liczba_osobnikow)
 
         #Zapisz populację do bazy danych 
-        #for i in range(len(gen.populacja)): 
-        #    #https://careerkarma.com/blog/python-typeerror-list-indices-must-be-integers-or-slices-not-str/  opis range len 
-        #    #print(gen.populacja[i]._id)
-        #    Database.save_to_db({"_id":gen.populacja[i]._id, "parameters": gen.populacja[i].parameters.tolist(), "standard_deviation": gen.populacja[i].standard_deviation.tolist(), "fitness": gen.populacja[i].fitness})
+        for i in range(len(gen.populacja)): 
+            #https://careerkarma.com/blog/python-typeerror-list-indices-must-be-integers-or-slices-not-str/  opis range len 
+            #print(gen.populacja[i]._id)
+            Database.save_to_db({"_id":gen.populacja[i]._id, "parameters": gen.populacja[i].parameters.tolist(), "standard_deviation": gen.populacja[i].standard_deviation.tolist(), "fitness": gen.populacja[i].fitness})
      
 
-        print("Czy rozpocząć obliczenia? \n tak - rozpocznij obliczenia \n nie - oczekuje na połączenie innych komputerów, \n end- kończy pracę \n")
+        print("Czy rozpocząć obliczenia? \n tak - rozpocznij obliczenia \n nie - oczekuje na połączenie innych komputerów lub sprawdza stan algorytmu, \n end- kończy pracę \n")
         print("Obecnie podłączona liczba komputerów: " + str(gen.info.instances))
         value = str(input())
 
@@ -201,7 +203,7 @@ if __name__ == "__main__":
             loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
             for loaded_store in loaded_info:
                 gen.info = store_schema_info.load(loaded_store)
-            print("Obecnie podłaczono: " + str(gen.info.instances - 1))
+            #print("Obecnie podłaczono: " + str(gen.info.instances - 1))
 
             if value == 'tak':
                 print("tak")
@@ -210,16 +212,30 @@ if __name__ == "__main__":
             elif value == 'nie':
                     print("Obecnie podłaczono: " + str(gen.info.instances -1))
 
-            if gen.info.algo_end == gen.info.instances -1:
+            if gen.info.algo_end == gen.info.instances -1 and gen.info.algo_start == 1:
                 #pobierz obiekty i sortuj 
+                print("algo_edn=instances-1, sortuj")
+
                 Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 0}})
                 Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_end": 0}})
+
+                loaded_objects = Database.load_from_db({"_id": {'$gte' : 0 , '$lt' : gen.info.population_size }})
+                for loaded_store in loaded_objects:
+                    gen.populacja.append(store_schema.load(loaded_store))
+
+                
+                gen.sort_population(gen.info.population_size)
+                
+                for i in range(gen.info.population_size): 
+                    Database.update_to_db({"_id": {'$eq': i}}, {"_id": i , "parameters": gen.populacja[i].parameters, "standard_deviation": gen.populacja[i].standard_deviation, "fitness": gen.populacja[i].fitness})
+            
 
             value = str(input())
         
         #Zamknij pozstałe nody
         if value == 'end':
             Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"end": True}})
+            Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": 0}})
 
     #Ta instancja zostaje nodem, wykonuje obliczenia 
     elif gen.info.instances > 0:
@@ -231,6 +247,8 @@ if __name__ == "__main__":
             loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
             for loaded_store in loaded_info:
                 gen.info = store_schema_info.load(loaded_store)
+
+            print(gen.info.end)
 
             if gen.info.algo_start == 0:
                 status = False 
@@ -266,8 +284,7 @@ if __name__ == "__main__":
 
                 time.sleep(10)
 
-    
-    Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": gen.info.instances -1}})
+   
 
 
 
