@@ -8,6 +8,7 @@ class StoreSchema_info(Schema):
      algo_end = fields.Int()
      end = fields.Boolean()
      population_size = fields.Int()
+     generation_number = fields.Int()
 
      @post_load
      def make_store(self, data, **kwargs):
