@@ -216,12 +216,12 @@ if __name__ == "__main__":
                 liczba_generacji = int(input('Wprowadź liczbę generacji algorytmu: ' ))
                 #Zapisz liczbę generacji
                 Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"generation_number": liczba_generacji}})
-
+                time.sleep(5)
                 Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 1}})
 
                 print("Rozpoczęto obliczenia!")
                 while liczba_generacji > 0:
-                    print("Oczekuje na zkończenie obliczeń")
+                    #print("Oczekuje na zkończenie obliczeń")
                     #Pobierz informacje o ilości podłączonych komputerów 
                     loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
                     for loaded_store in loaded_info:
@@ -246,7 +246,7 @@ if __name__ == "__main__":
                  
                         for i in range(gen.info.population_size): 
                             Database.update_to_db({"_id": {'$eq': i}}, {"_id": i , "parameters": gen.populacja[i].parameters, "standard_deviation": gen.populacja[i].standard_deviation, "fitness": gen.populacja[i].fitness})
-                    
+                                            
                         liczba_generacji -= 1
                         Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"generation_number": liczba_generacji}})
 
@@ -277,7 +277,7 @@ if __name__ == "__main__":
 
             liczba_generacji = gen.info.generation_number
 
-            print(gen.info.end)
+            #print(gen.info.end)
 
             #if gen.info.algo_start == 0:
             #    status = False 
@@ -310,7 +310,7 @@ if __name__ == "__main__":
                         gen.info = store_schema_info.load(loaded_store)
                     algo_end = gen.info.algo_end
                     Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_end": algo_end + 1}})
-                    print("Generacja:" + str(liczba_gener-acji))
+                    print("Generacja:" + str(liczba_generacji))
                     liczba_generacji -= 1
 
                 time.sleep(10)
