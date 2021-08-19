@@ -225,7 +225,7 @@ if __name__ == "__main__":
 
                 
                 gen.sort_population(gen.info.population_size)
-                
+                 
                 for i in range(gen.info.population_size): 
                     Database.update_to_db({"_id": {'$eq': i}}, {"_id": i , "parameters": gen.populacja[i].parameters, "standard_deviation": gen.populacja[i].standard_deviation, "fitness": gen.populacja[i].fitness})
             
@@ -252,7 +252,7 @@ if __name__ == "__main__":
 
             if gen.info.algo_start == 0:
                 status = False 
-            while gen.info.algo_start != 1 and status == False :
+            while gen.info.algo_start != 1 and status == False and gen.info.instances > 0 :
                 #Pobierz informacje o ilości podłączonych komputerów 
                 loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
                 for loaded_store in loaded_info:
@@ -266,7 +266,7 @@ if __name__ == "__main__":
                         gen.populacja.append(store_schema.load(loaded_store))
 
                 
-                    gen.start_algorithm(len(gen.populacja), 30)
+                    gen.start_algorithm(len(gen.populacja), 1)
                 
                     j = 0
                     for i in range(((instance_number - 1)*gen.info.population_size)//(gen.info.instances - 1) , (instance_number*gen.info.population_size)//(gen.info.instances - 1)): 
