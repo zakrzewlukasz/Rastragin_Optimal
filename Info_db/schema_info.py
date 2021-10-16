@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, post_load
-from Population_db.store_info import Store_info
+from Info_db.store_info import Store_info
 
 class StoreSchema_info(Schema):
      _id = fields.Int()

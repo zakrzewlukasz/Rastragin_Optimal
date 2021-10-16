@@ -34,3 +34,5 @@ class Database:
 	def load_from_db_info(cls, query):
 		return cls.database.info.find(query)
 
+	########## DB NODE ################################
+
