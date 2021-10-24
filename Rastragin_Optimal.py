@@ -16,7 +16,8 @@ from bson.objectid import ObjectId
 from Population import Population
 from Database import Database
 from Population_db.schema import StoreSchema
-from Population_db.schema_info import StoreSchema_info
+from Info_db.schema_info import StoreSchema_info
+from Node_db.schema import StoreSchema_node
 
 
 
@@ -267,7 +268,28 @@ if __name__ == "__main__":
     #Ta instancja zostaje nodem, wykonuje obliczenia 
     elif gen.info.instances > 0:
         instance_number = gen.info.instances
-        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": gen.info.instances + 1}})
+        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": gen.info.instances + 1}}) #Czy to potrzebne
+
+
+        Database.save_to_db_nodes()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
         while gen.info.end == False:
             #Pobierz informacje o ilości podłączonych komputerów 
@@ -379,3 +401,76 @@ if __name__ == "__main__":
 
     ##for i in gen.populacja:
     ##    print(i.fitness)
+
+
+
+
+#   co jesli ktorys nei zwróci danych 
+#czas ewaluacji funckji celu 
+#ktorys moze byc z nich wolniejszy 
+#4 rodzice mi lmabada potomków 
+#n =100 osbników
+
+#jesli czas obliczen jest za dlugi mozna dac innego 
+
+#n 100
+#5 osobniikow 8 potmkow zwracam 5 najlepszych 
+#wrzucamy do workera mi 
+
+
+#3 punkt przeglad stanu wiedzy - dzielimy 
+#Strategie ewolucyje oepratory gentyczne 
+#dwie startegi mi,lambda oraz mi plus lambda 
+#strategie różnicowe może warto zazanczyć
+#schematy selekcji 
+#nie sukipać się na wszsytkoch tylku usystematyzować 
+
+#przeglad standarów obliczeń chmurowych jak ona jest ulokowana w chmurach 
+
+#4. wymagania jakie chcemy osiegnac 
+#5 koncpecja rozwiązanaia - chmura tkaiego typu, workerzy, schemat blokowy 
+#6. projekt wykonania i implenatacja 
+
+#7 Badania i analiza wyników 
+
+#porównać z szybkościa na jenym komputarze 
+#wydajność wezłów ciezko zbadac na rastraginie 
+
+#funkcja celu - Jiles-Atherton model
+#rozwiazywanie równania różniczkowego zjada czas wersja isotrosipic
+#artykuł z 2000 złe obliczenie równanai różniczkowego 
+
+#modele selecji porównać czy nie ucieka do 
+#czas konwergencji czas jaki osiągnie zbieżność jakie najlpszy osobnik w poszczegolnych iteracjach 
+#algorytm stochastyczny - 
+
+
+
+
+
+#SCHEMAT NODE:
+
+
+#- zadecyduj jakie ma być n czy 2n czy n^2
+#- zobacz jaki zakres ma ostatni dodany node 
+#- jesli koniec populacji sprawdź statusy nodów - zobacz czy kótryś nie przekroczył średniego czasu 
+#- error in status weź jego populacje 
+#- utwórz node wstaw w niego star_time flaga in_progres, pop_in i pop_out 
+
+
+
+##Zadanie dla root
+#- zobacz czy któryś skończył 
+#- oblicz średni czas powyżej 2 nodów - jeśli dłuższy niż jakiś czas usuń go ( czas wyliczony średnio z próbek)
+
+
+
+
+
+
+
+
+
+
+
+
