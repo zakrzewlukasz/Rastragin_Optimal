@@ -36,3 +36,14 @@ class Database:
 
 	########## DB NODE ################################
 
+	@classmethod
+	def save_to_db_nodes(cls, data):
+		cls.database.nodes.insert_one(data)
+
+	@classmethod
+	def load_from_db_nodes(cls, query):
+		return cls.database.nodes.find(query)
+
+	@classmethod
+	def update_to_db_nodes(cls, find, query):
+		return cls.database.nodes.find(query)
