@@ -37,6 +37,7 @@ class Genetic:
         self.populacja = []
         self.sub_population = []
         self.info = []
+        self.node = []
 
 
         # check if a point is within the bounds of the search
@@ -155,6 +156,7 @@ if __name__ == "__main__":
     gen = Genetic()
     store_schema = StoreSchema()
     store_schema_info = StoreSchema_info()
+    store_schema_node = StoreSchema_node()
 
     Database.initialize()
     #Database.save_to_db_info({"_id": 0, "instances": 0, "algo_start": 6, "algo_end": 0})
@@ -280,15 +282,26 @@ if __name__ == "__main__":
             pop_divide = 2*gen.info.instances
 
         #Sprawdź jaki zakres ma ostatni node 
-        Database.load_from_db_nodes()
+        loaded_info = Database.load_from_db_nodes()
+        for loaded_store in loaded_info:
+            gen.node.append(store_schema_node.load(loaded_store))
+
+        
+
+        #- jesli koniec populacji sprawdź statusy nodów - zobacz czy kótryś nie przekroczył średniego czasu 
 
 
+        #- error in status weź jego populacje 
 
 
-
-
-
-
+        #- utwórz node wstaw w niego star_time flaga in_progres, pop_in i pop_out 
+        Database.save_to_db_nodes({"_id":instance_number,
+                                  "population_range_in": gen.populacja[i].parameters.tolist(),
+                                  "population_range_out": gen.populacja[i].standard_deviation.tolist(),
+                                  "time": 0,
+                                  "in_progress": False,
+                                  "start_time": time.strftime("%H:%M:%S", gmtime())})
+     
 
 
 
