@@ -270,19 +270,17 @@ if __name__ == "__main__":
         instance_number = gen.info.instances
         Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": gen.info.instances + 1}}) #Czy to potrzebne
 
+        #Zadecyduj jakie ma być n - czy 2n czy n^2
+        result = gen.info.population_size/gen.info.instances
 
-        Database.save_to_db_nodes()
+        if result >= 10:
+            pop_divide = pow(gen.info.instances,2)
 
+        else:
+            pop_divide = 2*gen.info.instances
 
-
-
-
-
-
-
-
-
-
+        #Sprawdź jaki zakres ma ostatni node 
+        Database.load_from_db_nodes()
 
 
 
@@ -290,52 +288,63 @@ if __name__ == "__main__":
 
 
 
+
+
+
+
+
+
+
+
+
+
+        #####TO DZIAŁAŁO
  
-        while gen.info.end == False:
-            #Pobierz informacje o ilości podłączonych komputerów 
-            loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
-            for loaded_store in loaded_info:
-                gen.info = store_schema_info.load(loaded_store)
+        #while gen.info.end == False:
+        #    #Pobierz informacje o ilości podłączonych komputerów 
+        #    loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
+        #    for loaded_store in loaded_info:
+        #        gen.info = store_schema_info.load(loaded_store)
 
-            liczba_generacji = gen.info.generation_number
+        #    liczba_generacji = gen.info.generation_number
 
-            #print(gen.info.end)
+        #    #print(gen.info.end)
 
-            #if gen.info.algo_start == 0:
-            #    status = False 
-            while gen.info.algo_start == 1 and gen.info.generation_number > 0 :
-                #Pobierz informacje o ilości podłączonych komputerów 
-                loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
-                for loaded_store in loaded_info:
-                    gen.info = store_schema_info.load(loaded_store)
-                print("Obecnie podłaczono: " + str(gen.info.instances -1))
+        #    #if gen.info.algo_start == 0:
+        #    #    status = False 
+        #    while gen.info.algo_start == 1 and gen.info.generation_number > 0 :
+        #        #Pobierz informacje o ilości podłączonych komputerów 
+        #        loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
+        #        for loaded_store in loaded_info:
+        #            gen.info = store_schema_info.load(loaded_store)
+        #        print("Obecnie podłaczono: " + str(gen.info.instances -1))
 
-                if gen.info.algo_start == 1 and liczba_generacji == gen.info.generation_number:
-                    #Część całkwita dzielenia // ---> początek::((instance number-1)*poulation_size)//instances  koniec:(instance number*poulation_size)//instances (instances pomijeszamy, bo jest tam rootem)
-                    loaded_objects = Database.load_from_db({"_id": {'$gte' : ((instance_number - 1)*gen.info.population_size)//(gen.info.instances - 1) , '$lt' : (instance_number*gen.info.population_size)//(gen.info.instances - 1) }})
-                    for loaded_store in loaded_objects:
-                        gen.populacja.append(store_schema.load(loaded_store))
+        #        if gen.info.algo_start == 1 and liczba_generacji == gen.info.generation_number:
+        #            #Część całkwita dzielenia // ---> początek::((instance number-1)*poulation_size)//instances  koniec:(instance number*poulation_size)//instances (instances pomijeszamy, bo jest tam rootem)
+        #            loaded_objects = Database.load_from_db({"_id": {'$gte' : ((instance_number - 1)*gen.info.population_size)//(gen.info.instances - 1) , '$lt' : (instance_number*gen.info.population_size)//(gen.info.instances - 1) }})
+        #            for loaded_store in loaded_objects:
+        #                gen.populacja.append(store_schema.load(loaded_store))
 
                 
-                    gen.start_algorithm(len(gen.populacja), 1)
+        #            gen.start_algorithm(len(gen.populacja), 1)
                 
-                    j = 0
-                    for i in range(((instance_number - 1)*gen.info.population_size)//(gen.info.instances - 1) , (instance_number*gen.info.population_size)//(gen.info.instances - 1)): 
-                        Database.update_to_db({"_id": {'$eq': i}}, {"_id": i , "parameters": gen.populacja[j].parameters, "standard_deviation": gen.populacja[j].standard_deviation, "fitness": gen.populacja[j].fitness})
-                        j += 1
-                    #status = True
+        #            j = 0
+        #            for i in range(((instance_number - 1)*gen.info.population_size)//(gen.info.instances - 1) , (instance_number*gen.info.population_size)//(gen.info.instances - 1)): 
+        #                Database.update_to_db({"_id": {'$eq': i}}, {"_id": i , "parameters": gen.populacja[j].parameters, "standard_deviation": gen.populacja[j].standard_deviation, "fitness": gen.populacja[j].fitness})
+        #                j += 1
+        #            #status = True
 
-                    #Pobierz informacje o ilości podłączonych komputerów 
-                    print("Zakończono obliczenia")
-                    loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
-                    for loaded_store in loaded_info:
-                        gen.info = store_schema_info.load(loaded_store)
-                    algo_end = gen.info.algo_end
-                    Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_end": algo_end + 1}})
-                    print("Generacja:" + str(liczba_generacji))
-                    liczba_generacji -= 1
+        #            #Pobierz informacje o ilości podłączonych komputerów 
+        #            print("Zakończono obliczenia")
+        #            loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
+        #            for loaded_store in loaded_info:
+        #                gen.info = store_schema_info.load(loaded_store)
+        #            algo_end = gen.info.algo_end
+        #            Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_end": algo_end + 1}})
+        #            print("Generacja:" + str(liczba_generacji))
+        #            liczba_generacji -= 1
 
-                time.sleep(10)
+        #        time.sleep(10)
 
    
 
