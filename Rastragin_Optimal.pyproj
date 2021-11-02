@@ -23,19 +23,14 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Database2.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Database.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Info_db\schema_info.py" />
+    <Compile Include="Info_db\store_info.py" />
+    <Compile Include="Node_db\schema.py" />
+    <Compile Include="Node_db\store.py" />
     <Compile Include="Population.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Population_db\schema_info.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Population_db\store_info.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Rastragin_Optimal.py" />
@@ -51,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Info_db\" />
+    <Folder Include="Node_db\" />
     <Folder Include="Population_db\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
