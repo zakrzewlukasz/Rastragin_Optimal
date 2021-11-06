@@ -286,7 +286,9 @@ if __name__ == "__main__":
         for loaded_store in loaded_info:
             gen.node.append(store_schema_node.load(loaded_store))
 
-        
+        #- ustal, od którego osobnika zacząć
+        n_nodes = len(gen.node)
+
 
         #- jesli koniec populacji sprawdź statusy nodów - zobacz czy kótryś nie przekroczył średniego czasu 
 
