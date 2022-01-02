@@ -4,6 +4,7 @@ from Info_db.store_info import Store_info
 class StoreSchema_info(Schema):
      _id = fields.Int()
      instances = fields.Int()
+     root = fields.Int()
      algo_start = fields.Int()
      algo_end = fields.Int()
      end = fields.Boolean()

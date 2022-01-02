@@ -230,7 +230,31 @@ if __name__ == "__main__":
                     for loaded_store in loaded_info:
                         gen.info = store_schema_info.load(loaded_store)
 
-                    if gen.info.algo_end == gen.info.instances -1 and gen.info.algo_start == 1:
+                    #Zadecyduj jakie ma być n - czy 2n czy n^2 (n- na ile części podzielić populację)
+                    result = gen.info.population_size/gen.info.instances
+
+                    if result >= 10:
+                        pop_divide = pow(gen.info.instances,2)
+
+                    else:
+                        pop_divide = 2*gen.info.instances
+
+                    #Sprawdź jaki zakres ma ostatni node 
+                    loaded_info = Database.load_from_db_nodes({})
+                    for loaded_store in loaded_info:
+                        gen.node.append(store_schema_node.load(loaded_store))
+
+                    #- ustal, od którego osobnika zacząć
+                    n_nodes = len(gen.node)
+
+
+                    #- jesli koniec populacji sprawdź statusy nodów - zobacz czy kótryś nie przekroczył średniego czasu 
+
+
+                    #- error in status weź jego populacje 
+
+
+                    if gen.info.algo_end == gen.info.instances -1 and gen.info.algo_start == 1: #do modyfikcajci, progam ma zacząć sortowanie bazy danych po obliczeniu wszystkich osobników 
                         #pobierz obiekty i sortuj 
                         print("Sortuj, Selekcja konwekcyjna")
                         print("Generacja:" + str(liczba_generacji))
@@ -272,7 +296,7 @@ if __name__ == "__main__":
         instance_number = gen.info.instances
         Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": gen.info.instances + 1}}) #Czy to potrzebne
 
-        #Zadecyduj jakie ma być n - czy 2n czy n^2
+        #Zadecyduj jakie ma być n - czy 2n czy n^2 (n- na ile części podzielić populację)
         result = gen.info.population_size/gen.info.instances
 
         if result >= 10:
@@ -282,7 +306,7 @@ if __name__ == "__main__":
             pop_divide = 2*gen.info.instances
 
         #Sprawdź jaki zakres ma ostatni node 
-        loaded_info = Database.load_from_db_nodes()
+        loaded_info = Database.load_from_db_nodes({})
         for loaded_store in loaded_info:
             gen.node.append(store_schema_node.load(loaded_store))
 
@@ -298,11 +322,11 @@ if __name__ == "__main__":
 
         #- utwórz node wstaw w niego star_time flaga in_progres, pop_in i pop_out 
         Database.save_to_db_nodes({"_id":instance_number,
-                                  "population_range_in": gen.populacja[i].parameters.tolist(),
-                                  "population_range_out": gen.populacja[i].standard_deviation.tolist(),
+                                  "population_range_in": 0,
+                                  "population_range_out": 10,
                                   "time": 0,
                                   "in_progress": False,
-                                  "start_time": time.strftime("%H:%M:%S", gmtime())})
+                                  "start_time": time.strftime("%H:%M:%S", time.gmtime())})
      
 
 
@@ -473,7 +497,8 @@ if __name__ == "__main__":
 
 
 #SCHEMAT NODE:
-
+#- utwórz node wstaw w niego star_time flaga in_progres, pop_in i pop_out 
+#- oczekuj  na otrzymanie zakresu populacji 
 
 #- zadecyduj jakie ma być n czy 2n czy n^2
 #- zobacz jaki zakres ma ostatni dodany node 
@@ -487,6 +512,8 @@ if __name__ == "__main__":
 #- zobacz czy któryś skończył 
 #- oblicz średni czas powyżej 2 nodów - jeśli dłuższy niż jakiś czas usuń go ( czas wyliczony średnio z próbek)
 
+
+#- pamiętac aby dodać osobniki do ostatniego node, kótre zostały po podziale polulacji (reszta z dzielnia)
 
 
 
