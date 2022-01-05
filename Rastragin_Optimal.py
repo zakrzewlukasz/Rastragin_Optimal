@@ -1,4 +1,5 @@
 import numpy as np
+import sys #zatrzymuje program 
 from numpy import asarray
 from numpy import exp
 from numpy import sqrt
@@ -171,11 +172,12 @@ if __name__ == "__main__":
         gen.info = store_schema_info.load(loaded_store)
 
     #Ta instacja zostaje rootem w algorytmie, czyli generuje populację oraz rozdziela obliczenia 
-    if gen.info.instances == 0:
-        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": 1}})
+    if gen.info.root == 0: #warunek zabezpieczajcy awaryje zatrzymanie root, aby ustawic potem na 0
+        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": 0}})
         Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"end": False}})
         Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 0}})
         Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_end": 0}})
+        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"root": 1}})
         
         #Usuń rekordy dotyczące populacji z bazy danych 
         Database.delete_db_collection_evo_records()
@@ -220,68 +222,101 @@ if __name__ == "__main__":
                 #Zapisz liczbę generacji
                 Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"generation_number": liczba_generacji}})
                 time.sleep(5)
-                Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 1}})
+                #Rozpaczęcie algorytmu oraz oznaczenie root node
+                Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 1, "root": 1}})
 
-                print("Rozpoczęto obliczenia!")
-                while liczba_generacji > 0:
-                    #print("Oczekuje na zkończenie obliczeń")
-                    #Pobierz informacje o ilości podłączonych komputerów 
-                    loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
-                    for loaded_store in loaded_info:
-                        gen.info = store_schema_info.load(loaded_store)
+                try:
 
-                    #Zadecyduj jakie ma być n - czy 2n czy n^2 (n- na ile części podzielić populację)
-                    result = gen.info.population_size/gen.info.instances
+                    #Oczekiwanie na dołaczenie minimum jednego noda
+                    i = 0
+                    while gen.info.instances == 0:
+                        print("Oczekiwanie na dołączenie nodów")
+                        time.sleep(10)
+                        i+=1
+                        pass
+                        #Po 5 razach opuśc pętle 
+                        if i == 5:
+                            break
 
-                    if result >= 10:
-                        pop_divide = pow(gen.info.instances,2)
-
+                    #Wykonaj, gdy dołaczy jakiś node
                     else:
-                        pop_divide = 2*gen.info.instances
+                        print("Rozpoczęto obliczenia!")
+                        while liczba_generacji > 0:
+                            #print("Oczekuje na zkończenie obliczeń")
+                            #Pobierz informacje o ilości podłączonych komputerów 
+                            loaded_info = Database.load_from_db_info({"_id": {'$eq': 0}})
+                            for loaded_store in loaded_info:
+                                gen.info = store_schema_info.load(loaded_store)
 
-                    #Sprawdź jaki zakres ma ostatni node 
-                    loaded_info = Database.load_from_db_nodes({})
-                    for loaded_store in loaded_info:
-                        gen.node.append(store_schema_node.load(loaded_store))
+                            #Zadecyduj jakie ma być n - czy 2n czy n^2 (n- na ile części podzielić populację)
+                            result = gen.info.population_size/gen.info.instances
 
-                    #- ustal, od którego osobnika zacząć
-                    n_nodes = len(gen.node)
+                            if result >= 10:
+                                pop_divide = pow(gen.info.instances,2)
+
+                            else:
+
+                                pop_divide = 2*gen.info.instances
+
+                            ##Sprawdź jaki zakres ma ostatni node 
+                            #loaded_info = Database.load_from_db_nodes({})
+                            #for loaded_store in loaded_info:
+                            #    gen.node.append(store_schema_node.load(loaded_store))
+
+                            #Podziel populacje na nody
+                            for i in len(gen.info.population_size % pop_divide):
+                                print(i)
+                                j = gen.info.population_size % pop_divide
+                                print(j)
+                                Database.save_to_db_nodes({"_id":i,
+                                "population_range_in": i,
+                                "population_range_out": 10,
+                                "time": 0,
+                                "in_progress": False,
+                                "start_time": time.strftime("%H:%M:%S", time.gmtime())})
 
 
-                    #- jesli koniec populacji sprawdź statusy nodów - zobacz czy kótryś nie przekroczył średniego czasu 
+                            #- jesli koniec populacji sprawdź statusy nodów - zobacz czy kótryś nie przekroczył średniego czasu 
 
 
-                    #- error in status weź jego populacje 
+                            #- error in status weź jego populacje 
 
 
-                    if gen.info.algo_end == gen.info.instances -1 and gen.info.algo_start == 1: #do modyfikcajci, progam ma zacząć sortowanie bazy danych po obliczeniu wszystkich osobników 
-                        #pobierz obiekty i sortuj 
-                        print("Sortuj, Selekcja konwekcyjna")
-                        print("Generacja:" + str(liczba_generacji))
-                        time.sleep(5)
+                            if gen.info.algo_end == gen.info.instances -1 and gen.info.algo_start == 1: #do modyfikcajci, progam ma zacząć sortowanie bazy danych po obliczeniu wszystkich osobników 
+                                #pobierz obiekty i sortuj 
+                                print("Sortuj, Selekcja konwekcyjna")
+                                print("Generacja:" + str(liczba_generacji))
+                                time.sleep(5)
 
-                        #Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 0}})
-                        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_end": 0}})
-                        #Wyczyść tablicę 
-                        gen.populacja = []
-                        loaded_objects = Database.load_from_db({"_id": {'$gte' : 0 , '$lt' : gen.info.population_size }})
-                        for loaded_store in loaded_objects:
-                            gen.populacja.append(store_schema.load(loaded_store))
+                                #Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 0}})
+                                Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_end": 0}})
+                                #Wyczyść tablicę 
+                                gen.populacja = []
+                                loaded_objects = Database.load_from_db({"_id": {'$gte' : 0 , '$lt' : gen.info.population_size }})
+                                for loaded_store in loaded_objects:
+                                    gen.populacja.append(store_schema.load(loaded_store))
 
                 
-                        gen.sort_population(gen.info.population_size)
+                                gen.sort_population(gen.info.population_size)
                  
-                        for i in range(gen.info.population_size): 
-                            Database.update_to_db({"_id": {'$eq': i}}, {"_id": i , "parameters": gen.populacja[i].parameters, "standard_deviation": gen.populacja[i].standard_deviation, "fitness": gen.populacja[i].fitness})
+                                for i in range(gen.info.population_size): 
+                                    Database.update_to_db({"_id": {'$eq': i}}, {"_id": i , "parameters": gen.populacja[i].parameters, "standard_deviation": gen.populacja[i].standard_deviation, "fitness": gen.populacja[i].fitness})
                                             
-                        liczba_generacji -= 1
-                        Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"generation_number": liczba_generacji}})
+                                liczba_generacji -= 1
+                                Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"generation_number": liczba_generacji}})
 
-                Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 0}})
-                print("Co dalej chcesz zrobić? \n tak - rozpocznij obliczenia \n nie - oczekuje na połączenie innych komputerów lub sprawdza stan algorytmu, \n end- kończy pracę \n")
+                    Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 0}})
+                    print("Co dalej chcesz zrobić? \n tak - rozpocznij obliczenia \n nie - oczekuje na połączenie innych komputerów lub sprawdza stan algorytmu, \n end- kończy pracę \n")
+
+
+                except KeyboardInterrupt: # !!!throw execption do poprawy!!
+                    Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"root": 0}})
+                    continue
+                    
+                
 
             elif value == 'nie':
-                    print("Obecnie podłaczono: " + str(gen.info.instances -1))
+                    print("Obecnie podłaczono: " + str(gen.info.instances))
 
           
             value = str(input())
@@ -290,20 +325,23 @@ if __name__ == "__main__":
         if value == 'end':
             Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"end": True}})
             Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": 0}})
+            Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"root": 0}})
+           
+
 
     #Ta instancja zostaje nodem, wykonuje obliczenia 
-    elif gen.info.instances > 0:
+    elif gen.info.root == 1:
         instance_number = gen.info.instances
         Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"instances": gen.info.instances + 1}}) #Czy to potrzebne
 
         #Zadecyduj jakie ma być n - czy 2n czy n^2 (n- na ile części podzielić populację)
-        result = gen.info.population_size/gen.info.instances
+        #result = gen.info.population_size/gen.info.instances
 
-        if result >= 10:
-            pop_divide = pow(gen.info.instances,2)
+        #if result >= 10:
+        #    pop_divide = pow(gen.info.instances,2)
 
-        else:
-            pop_divide = 2*gen.info.instances
+        #else:
+        #    pop_divide = 2*gen.info.instances
 
         #Sprawdź jaki zakres ma ostatni node 
         loaded_info = Database.load_from_db_nodes({})
@@ -512,7 +550,7 @@ if __name__ == "__main__":
 #- zobacz czy któryś skończył 
 #- oblicz średni czas powyżej 2 nodów - jeśli dłuższy niż jakiś czas usuń go ( czas wyliczony średnio z próbek)
 
-
+#- popraw try exeption z ctrc+c powduje zwracanie wyjątku 
 #- pamiętac aby dodać osobniki do ostatniego node, kótre zostały po podziale polulacji (reszta z dzielnia)
 
 
