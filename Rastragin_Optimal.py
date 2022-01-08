@@ -293,7 +293,7 @@ if __name__ == "__main__":
 
                         while liczba_generacji > 0:
                             #print("Oczekuje na zkończenie obliczeń")
-
+                            time.sleep(10)
 
                             #import info o nodach 
                             gen.nodes = []
@@ -304,11 +304,12 @@ if __name__ == "__main__":
                             #statusy nodów oraz aktualizacja czasu
                             for i in range(len(gen.nodes)):
                                 if(gen.nodes[i].calculated == 0):
-                                    print ((datetime.now() - gen.nodes[i].start_time).total_seconds())
-                                    #print(datetime.combine(gen.nodes[i].start_time, exit) - datetime.combine(datetime.now(), enter))
+                                    Database.update_to_db_nodes({"_id": {'$eq': i}}, {'$set': {"time": ((datetime.now() - gen.nodes[i].start_time).total_seconds())}})
+                                    
 
                             #- jesli koniec populacji sprawdź statusy nodów - zobacz czy kótryś nie przekroczył średniego czasu  
 
+                            #zobacz czy nie został jako ostatni wtedy średnia oszukana, daj mu dodatkowe kilkanascie sec i usun
 
                             #- error in status weź jego populacje 
 

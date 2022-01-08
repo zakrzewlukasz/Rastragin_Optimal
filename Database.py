@@ -46,7 +46,7 @@ class Database:
 
 	@classmethod
 	def update_to_db_nodes(cls, find, query):
-		return cls.database.nodes.update(query)
+		return cls.database.nodes.update(find, query)
 
 	@classmethod
 	def delete_db_collection_nodes(cls):
