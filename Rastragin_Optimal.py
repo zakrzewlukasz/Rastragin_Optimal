@@ -298,7 +298,67 @@ if __name__ == "__main__":
                             #sprawdzenie czy wszytkie nody nie są zawieszone, przez co nie algorytm nie przejdzie do koljnej generacji 
                             # 1 minutes from now
                             timeout = time.time() + 60*1 
+                            while True:                 
+                                #import info o nodach 
+                                gen.nodes = []
+                                calculated_flag =0
+                                loaded_info = Database.load_from_db_nodes({})
+                                for loaded_store in loaded_info:
+                                    gen.nodes.append(store_schema_node.load(loaded_store))
 
+                                for i in range(len(gen.nodes)):
+                                    if(gen.nodes[i].calculated == True): #sprawdza ile nodów rozpoczeło obliczenia
+                                        calculated_flag+=1 
+
+                                if calculated_flag == False  and time.time() > timeout: # jesli flaga jest wikesza od zera to czekaj aż policzy pierwszy i weź jego czas, jeśli nie zakończ program. dodatkowy warunek zakończ po minucie czkania
+                                    break
+                            else:
+                                first_node_finish = 0
+                                for i in range(len(gen.nodes)):
+                                    if(gen.nodes[i].calculated == False and gen.nodes[i].in_progress == True):
+                                        Database.update_to_db_nodes({"_id": {'$eq': i}}, {'$set': {"time": ((datetime.now() - gen.nodes[i].start_time).total_seconds())}})
+
+                                    elif(gen.nodes[i].calculated == True and first_node_finish ==0):
+                                        time_avr = 2*gen.nodes[i].time
+                                        first_node_finish += 1
+
+                                    elif(gen.nodes[i].in_progress == True and gen.nodes[i].time > time_avr):
+                                        gen.nodes[i].in_progress = False
+
+                            # - pierwszy czas ile wynosi i dodać tyle samo na obliczenie pozostałego 
+                            #- jesli koniec populacji sprawdź statusy nodów - zobacz czy któryś nie przekroczył średniego czasu  
+
+                            #zobacz czy nie został jako ostatni wtedy średnia oszukana, daj mu dodatkowe kilkanascie sec i usun
+
+                            #- error in status weź jego populacje 
+
+
+                            #if gen.info.algo_end == gen.info.instances -1 and gen.info.algo_start == 1: #do modyfikcajci, progam ma zacząć sortowanie bazy danych po obliczeniu wszystkich osobników 
+                            #    #pobierz obiekty i sortuj 
+                            #    print("Sortuj, Selekcja konwekcyjna")
+                            #    print("Generacja:" + str(liczba_generacji))
+                            #    time.sleep(5)
+
+                            #    #Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 0}})
+                            #    Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_end": 0}})
+                            #    #Wyczyść tablicę 
+                            #    gen.populacja = []
+                            #    loaded_objects = Database.load_from_db({"_id": {'$gte' : 0 , '$lt' : gen.info.population_size }})
+                            #    for loaded_store in loaded_objects:
+                            #        gen.populacja.append(store_schema.load(loaded_store))
+
+
+                
+                            #    gen.sort_population(gen.info.population_size)
+                 
+                            #    for i in range(gen.info.population_size): 
+                            #        Database.update_to_db({"_id": {'$eq': i}}, {"_id": i , "parameters": gen.populacja[i].parameters, "standard_deviation": gen.populacja[i].standard_deviation, "fitness": gen.populacja[i].fitness})
+                                            
+                            #    liczba_generacji -= 1
+                            #    Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"generation_number": liczba_generacji}})
+
+                    #Database.update_to_db_info({"_id": {'$eq': 0}}, {'$set': {"algo_start": 0}})
+                    #print("Co dalej chcesz zrobić? \n tak - rozpocznij obliczenia \n nie - oczekuje na połączenie innych komputerów lub sprawdza stan algorytmu, \n end- kończy pracę \n")
 
 
                 except KeyboardInterrupt: # !!!throw execption do poprawy!!
