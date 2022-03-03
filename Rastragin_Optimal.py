@@ -314,14 +314,15 @@ if __name__ == "__main__":
                                     gen.nodes.append(store_schema_node.load(loaded_store))
 
                                 for i in range(len(gen.nodes)):
-                                    if(gen.nodes[i].calculated == True): #sprawdza ile nodów rozpoczeło obliczenia
-                                        calculated_flag+=1 
+                                    if(gen.nodes[i].calculated == False): #sprawdza ile nodów rozpoczeło obliczenia
+                                        calculated_flag-=1 
 
                                 if calculated_flag == 0  and (time.time() > timeout): # jesli flaga jest wikesza od zera to czekaj aż policzy pierwszy i weź jego czas, jeśli nie zakończ program. dodatkowy warunek zakończ po minucie czkania
                                     stop_flag = 1
                                     break
                                 if calculated_flag == len(gen.nodes):
                                     print("Zakończono obliczenia w tej generacji")
+                                    liczba_generacji -= 1
                                     break
 
                                 else:
